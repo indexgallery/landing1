@@ -331,6 +331,26 @@ for product in products:
     if product['name'] in price_updates:
         product['price'] = price_updates[product['name']]
 
+sfumato_works = [
+    ('Утро в Пейзажном парке', '90 × 70 см', '150 000 ₽', 'assets/lurie-sfumato-park.jpg'),
+    ('Туманное утро. Острова', '150 × 170 см', '580 000 ₽', 'assets/lurie-sfumato-islands.jpg'),
+    ('Закат', '100 × 100 см', '160 000 ₽', 'assets/lurie-sfumato-sunset.jpg'),
+]
+lurie_end = max(i for i, product in enumerate(products) if product['resident'] == 'Ирина Лурье') + 1
+products[lurie_end:lurie_end] = [
+    {
+        'name': f'Картина «{title}»',
+        'resident': 'Ирина Лурье',
+        'type': 'art',
+        'specs': dimensions,
+        'description': 'Из цикла «Сфумато». Холст, масло.',
+        'price': price,
+        'photo': photo,
+        'scene': True,
+    }
+    for title, dimensions, price, photo in sfumato_works
+]
+
 with open(TARGET, 'w', encoding='utf-8') as output:
     output.write('/* Generated from Каталог.xlsx. Do not edit manually. */\n')
     output.write('window.catalogProducts = ')
