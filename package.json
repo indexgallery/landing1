@@ -4,7 +4,7 @@
   "type": "module",
   "overrides": { "zod": "^4.6.6" },
   "engines": {
-    "node": ">=22"
+    "node": ">=22 <25"
   },
   "scripts": {
     "build": "node scripts/build.mjs",

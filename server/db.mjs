@@ -4,7 +4,11 @@ let pool;
 export function getPool() {
   if (!pool) {
     if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is not configured');
-    pool = new pg.Pool({ connectionString: process.env.DATABASE_URL, max: 3, connectionTimeoutMillis: 5000, idleTimeoutMillis: 10000 });
+    const connection = new URL(process.env.DATABASE_URL);
+    // Keep certificate/hostname verification explicit when pg changes its
+    // interpretation of the legacy SSL mode aliases in a future major release.
+    if (!connection.searchParams.has('uselibpqcompat') && ['prefer', 'require', 'verify-ca'].includes(connection.searchParams.get('sslmode'))) connection.searchParams.set('sslmode', 'verify-full');
+    pool = new pg.Pool({ connectionString: connection.toString(), max: 3, connectionTimeoutMillis: 5000, idleTimeoutMillis: 10000 });
     if (process.env.VERCEL) attachDatabasePool(pool);
   }
   return pool;
