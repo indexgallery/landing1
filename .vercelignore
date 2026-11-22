@@ -1,0 +1,13 @@
+.git
+.vercel
+.env
+.env.*
+node_modules
+public
+img
+backups
+tests
+Dockerfile*
+compose*.yaml
+__pycache__
+.venv

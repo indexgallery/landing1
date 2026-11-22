@@ -6,7 +6,14 @@ export const siteFields = context.window.siteFields;
 export function safePhoto(value) {
   if (typeof value !== 'string' || value.length > 2048) return false;
   if (value === '' || /^(?:img\/)?assets\/[\w./-]+$/.test(value)) return true;
-  try { const url = new URL(value); return url.protocol === 'https:' || (url.protocol === 'http:' && ['localhost','127.0.0.1'].includes(url.hostname)); } catch { return false; }
+  try {
+    const url = new URL(value);
+    const configuredStorage = process.env.STORAGE_DRIVER === 's3' && process.env.S3_PUBLIC_URL
+      ? new URL(process.env.S3_PUBLIC_URL) : null;
+    const trustedStorage = configuredStorage && url.origin === configuredStorage.origin
+      && url.pathname.startsWith(configuredStorage.pathname.replace(/\/$/, '') + '/');
+    return url.protocol === 'https:' || (url.protocol === 'http:' && (['localhost','127.0.0.1'].includes(url.hostname) || trustedStorage));
+  } catch { return false; }
 }
 function invalid(message) { throw Object.assign(new Error(message), { status: 400 }); }
 export function validateState(value) {

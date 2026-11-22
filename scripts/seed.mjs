@@ -17,7 +17,9 @@ try {
       await initialiseLocalStorage();
       const context = { window:{} };
       for (const file of ['catalog-data.js','site-data.js']) vm.runInNewContext(await readFile(file,'utf8'), context);
-      const state = { products:context.window.catalogProducts, categories: context.window.catalogCategories || ['furniture','art','light'], site: context.window.siteContent || {} };
+      const state = process.env.CATALOG_IMPORT_FILE
+        ? JSON.parse(await readFile(process.env.CATALOG_IMPORT_FILE, 'utf8'))
+        : { products:context.window.catalogProducts, categories: context.window.catalogCategories || ['furniture','art','light'], site: context.window.siteContent || {} };
       state.categories = [...new Set([...state.categories, ...state.products.map(p=>p.type)])];
       const html = load(await readFile('index.html','utf8'));
       const cache = new Map();
