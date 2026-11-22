@@ -1,0 +1,53 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: catalog
+      POSTGRES_USER: catalog
+      POSTGRES_PASSWORD: local-catalog
+    ports: ["127.0.0.1:5432:5432"]
+    volumes: ["postgres-data:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U catalog -d catalog"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+  minio:
+    build:
+      context: .
+      dockerfile: Dockerfile.minio
+    command: server /data --console-address :9001
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY_ID:?Run npm run setup first}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_ACCESS_KEY:?Run npm run setup first}
+      MINIO_API_CORS_ALLOW_ORIGIN: http://localhost:4173
+    ports: ["127.0.0.1:9000:9000", "127.0.0.1:9001:9001"]
+    volumes: ["minio-data:/data"]
+  init:
+    build: .
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://catalog:local-catalog@postgres:5432/catalog
+      S3_ENDPOINT: http://minio:9000
+      LOCAL_STORAGE_INIT: "true"
+    command: sh -c 'npm run db:migrate && npm run db:seed'
+    depends_on:
+      postgres: { condition: service_healthy }
+      minio: { condition: service_started }
+  web:
+    build: .
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://catalog:local-catalog@postgres:5432/catalog
+      S3_ENDPOINT: http://minio:9000
+    ports: ["127.0.0.1:4173:4173"]
+    depends_on:
+      init: { condition: service_completed_successfully }
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:4173/api/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+volumes:
+  postgres-data:
+  minio-data:

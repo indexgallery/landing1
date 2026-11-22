@@ -1,0 +1,68 @@
+# Isolated disposable stack. No host ports, production env files or shared volumes.
+x-app-environment: &app-environment
+  APP_ORIGIN: http://web:4173
+  ADMIN_PASSWORD: integration-only-password
+  SESSION_SECRET: integration-only-session-secret-0000000000000000000000000000
+  DATABASE_URL: postgres://integration:integration@postgres:5432/integration
+  STORAGE_DRIVER: s3
+  S3_ENDPOINT: http://minio:9000
+  S3_PUBLIC_ENDPOINT: http://minio:9000
+  S3_PUBLIC_URL: http://minio:9000/catalog-integration
+  S3_REGION: us-east-1
+  S3_BUCKET: catalog-integration
+  S3_ACCESS_KEY_ID: integration-key
+  S3_SECRET_ACCESS_KEY: integration-only-storage-secret
+  S3_FORCE_PATH_STYLE: "true"
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: integration
+      POSTGRES_PASSWORD: integration
+      POSTGRES_DB: integration
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U integration -d integration"]
+      interval: 2s
+      timeout: 3s
+      retries: 60
+  minio:
+    build:
+      context: .
+      dockerfile: Dockerfile.minio
+    command: server /data --console-address :9001
+    environment:
+      MINIO_ROOT_USER: integration-key
+      MINIO_ROOT_PASSWORD: integration-only-storage-secret
+      MINIO_API_CORS_ALLOW_ORIGIN: http://web:4173
+  init:
+    build: .
+    environment:
+      <<: *app-environment
+      LOCAL_STORAGE_INIT: "true"
+    command: sh -c 'npm run db:migrate && npm run db:seed'
+    depends_on:
+      postgres: { condition: service_healthy }
+      minio: { condition: service_started }
+  web:
+    build: .
+    environment: *app-environment
+    depends_on:
+      init: { condition: service_completed_successfully }
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:4173/api/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.integration
+    environment:
+      CATALOG_INTEGRATION: "1"
+      BASE_URL: http://web:4173
+      ADMIN_PASSWORD: integration-only-password
+      DATABASE_URL: postgres://integration:integration@postgres:5432/integration
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONUNBUFFERED: "1"
+    depends_on:
+      web: { condition: service_healthy }

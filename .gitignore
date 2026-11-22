@@ -1,0 +1,12 @@
+node_modules/
+public/
+.env
+.env.*
+!.env.example
+.vercel/
+.DS_Store
+backups/
+img/
+__pycache__/
+.pytest_cache/
+.venv/

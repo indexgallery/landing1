@@ -9,6 +9,15 @@ const dialogDescription = document.querySelector('#dialogDescription');
 const dialogSpecs = document.querySelector('#dialogSpecs');
 const dialogIndex = document.querySelector('#dialogIndex');
 const labels = { furniture: 'Мебель', art: 'Искусство', light: 'Свет' };
+const categoryLabel = (type) => Object.hasOwn(labels, type) ? labels[type] : type;
+const categoryKeys = [...new Set([...Object.keys(labels), ...(window.catalogCategories || []), ...products.map((product) => product.type)])];
+const filterRow = document.querySelector('.filter-row');
+filterRow.replaceChildren(...['all', ...categoryKeys.filter((key) => key !== 'all')].map((key) => {
+  const button = document.createElement('button');
+  button.type = 'button'; button.className = 'filter' + (key === 'all' ? ' is-active' : ''); button.dataset.filter = key;
+  button.append(document.createTextNode(key === 'all' ? 'Все ' : `${categoryLabel(key)} `), document.createElement('span'));
+  return button;
+}));
 
 function photoClass(product) { return product.scene ? 'product-photo--scene' : 'product-photo--cutout'; }
 
@@ -46,7 +55,9 @@ function makeCard(product) {
   }
   const meta = document.createElement('div');
   meta.className = 'card-meta';
-  meta.innerHTML = `<span>${labels[product.type]}</span><span>${String(products.indexOf(product) + 1).padStart(2, '0')}</span>`;
+  const category = document.createElement('span'); category.textContent = categoryLabel(product.type);
+  const number = document.createElement('span'); number.textContent = String(products.indexOf(product) + 1).padStart(2, '0');
+  meta.append(category, number);
   const name = document.createElement('p');
   name.className = 'card-name';
   name.textContent = product.name;
@@ -137,7 +148,7 @@ function openProduct(product) {
   dialogPrice.textContent = product.price;
   dialogAuthor.textContent = product.resident;
   renderDescription(product.description);
-  dialogIndex.textContent = `${String(index).padStart(2, '0')} / ${labels[product.type].toLowerCase()}`;
+  dialogIndex.textContent = `${String(index).padStart(2, '0')} / ${categoryLabel(product.type).toLowerCase()}`;
   dialogSpecs.replaceChildren(makeSpec('Характеристики', product.specs), makeSpec('Резидент', product.resident));
   if (product.variants?.length) {
     dialogSpecs.replaceChildren(

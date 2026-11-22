@@ -1,0 +1,31 @@
+{
+  "name": "design-index-catalogue",
+  "private": true,
+  "type": "module",
+  "overrides": { "zod": "^4.6.6" },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "start": "node server/local.mjs",
+    "setup": "node scripts/setup.mjs",
+    "vercel:setup": "node scripts/vercel-setup.mjs",
+    "db:migrate": "node --env-file-if-exists=.env scripts/migrate.mjs",
+    "db:seed": "node --env-file-if-exists=.env scripts/seed.mjs",
+    "test": "node --experimental-test-module-mocks --test tests/*.test.mjs",
+    "test:integration": "python3 scripts/test_integration.py"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.900.0",
+    "@aws-sdk/s3-request-presigner": "^3.900.0",
+    "@vercel/blob": "^2.0.0",
+    "@vercel/functions": "^3.0.0",
+    "cheerio": "^1.1.2",
+    "esbuild": "^0.25.0",
+    "pg": "^8.16.0"
+  },
+  "devDependencies": {
+    "pg-mem": "^3.0.14"
+  }
+}

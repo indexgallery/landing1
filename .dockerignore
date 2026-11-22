@@ -1,0 +1,11 @@
+.git
+.env
+.env.*
+node_modules
+public
+.vercel
+backups
+.DS_Store
+.venv
+__pycache__
+**/__pycache__

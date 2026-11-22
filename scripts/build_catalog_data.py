@@ -10,8 +10,8 @@ from shutil import copy2
 
 SOURCE = '/Users/annakronova/Desktop/Каталог.xlsx'
 TARGET = 'catalog-data.js'
-SOURCE_ASSETS = Path('assets/catalog-update')
-WEB_ASSETS = Path('assets/catalog')
+SOURCE_ASSETS = Path('img/assets/catalog-update')
+WEB_ASSETS = Path('img/assets/catalog')
 NS = {'m': 'http://schemas.openxmlformats.org/spreadsheetml/2006/main'}
 
 NAMES = {
@@ -238,7 +238,7 @@ for product in products:
         product['description'] = 'Торшер представляет собой сосредоточенную в верхней точке композицию, выполненную из полированной нержавеющей стали и матовых рассеивающих полусфер. Управление верхним и нижним светом разработано независимо друг от друга, для более контекстной настройки сценариев в пространстве. Верхний — мягко заполняет интерьер, нижний — деликатно освещает в ночное время. Сдержанный внешний вид позволяет предмету интегрироваться в самые разные интерьеры.'
         product['specs'] = 'Высота: 1600 мм; ширина: 330 мм; глубина: 330 мм'
     if product['name'] == 'Столик «Неокуб»':
-        product['photo'] = 'assets/neocube.jpg'
+        product['photo'] = 'img/assets/neocube.jpg'
         product['scene'] = True
 
 import unicodedata
@@ -250,7 +250,7 @@ named_photos = {
     'Стол кофейный Z/H Maya': 'Стол кофейный Z:H Maya.png',
     'Панно «Озеро»': 'панно озеро.jpg',
 }
-files = {unicodedata.normalize('NFC', p.name): p for p in Path('картинки 2').iterdir()}
+files = {unicodedata.normalize('NFC', p.name): p for p in Path('img/картинки 2').iterdir()}
 replaced = 0
 for index, product in enumerate(products):
     expected = named_photos.get(product['name'])
@@ -282,7 +282,7 @@ renamed_objects = {
 }
 loss_index = next(i for i, p in enumerate(products) if p['name'] == 'Стол ЛОСС, серия «Дюна»')
 loss = dict(products[loss_index])
-loss.update(name='Стол ЛОСС, серия «Дюна»', specs='400 × 400 × 580 мм', photo='assets/loss-dune.png', type='furniture', scene=False)
+loss.update(name='Стол ЛОСС, серия «Дюна»', specs='400 × 400 × 580 мм', photo='img/assets/loss-dune.png', type='furniture', scene=False)
 for product in products:
     product['name'] = renamed_objects.get(product['name'], product['name'])
 products.insert(loss_index + 1, loss)
@@ -290,11 +290,11 @@ products = [product for product in products if product['name'] != 'Стол Х (
 
 for product in products:
     if product['name'] == 'Ваза «Сад камней / Crust»':
-        product['photo'] = 'assets/stone-garden-1.jpg'
-        product['photos'] = ['assets/stone-garden-1.jpg', 'assets/stone-garden-2.jpg']
+        product['photo'] = 'img/assets/stone-garden-1.jpg'
+        product['photos'] = ['img/assets/stone-garden-1.jpg', 'img/assets/stone-garden-2.jpg']
         product['scene'] = True
     if product['name'] == 'Ваза «Сад камней / Strata»':
-        product['photo'] = 'assets/stone-garden-strata.jpg'
+        product['photo'] = 'img/assets/stone-garden-strata.jpg'
         product['scene'] = True
 
 bubble_index = next(i for i, product in enumerate(products) if product['name'] == 'Кресло «Bubble»')
@@ -305,7 +305,7 @@ products.insert(bubble_index + 1, {
     'specs': 'Шерсть ламы, эпоксидная смола.',
     'description': 'Мягкие белые подушки на розовой опоре вызывают ассоциацию с чем-то воздушным, легким, словно пузырь жевательной резинки с тонким ягодным вкусом. Дизайн кресла максимально лаконичен, без лишних элементов. Здесь нет объемных подлокотников и массивных ножек. Эргономичное, компактное, с удобным углом наклона спинки, это кресло создано для комфорта и релаксации.\n\nВнешне невесомое кресло похоже на облако, визуально делающее пространство более светлым и лёгким.\n\nЭто предмет мебели, который акцентирует на себе внимание в интерьере и подойдет креативным и молодым душой мечтателям. Тем, кто умеет широко мыслить и обладает внутренней свободой.',
     'price': '985 000 ₽',
-    'photo': 'assets/bubble-llama.jpg',
+    'photo': 'img/assets/bubble-llama.jpg',
     'scene': True,
 })
 
@@ -313,7 +313,7 @@ for product in products:
     if product['name'] == 'Журнальные столики «Радуга / Rainbow»':
         product.update(
             name='Журнальные столики «Призма / Prisma»',
-            photo='assets/prisma-tables.jpg', scene=True,
+            photo='img/assets/prisma-tables.jpg', scene=True,
             price='88 000–98 000 ₽',
             specs='400 × 400 × 400 мм; 500 × 500 × 500 мм',
             variants=[
@@ -332,9 +332,9 @@ for product in products:
         product['price'] = price_updates[product['name']]
 
 sfumato_works = [
-    ('Утро в Пейзажном парке', '90 × 70 см', '150 000 ₽', 'assets/lurie-sfumato-park.jpg'),
-    ('Туманное утро. Острова', '150 × 170 см', '580 000 ₽', 'assets/lurie-sfumato-islands.jpg'),
-    ('Закат', '100 × 100 см', '160 000 ₽', 'assets/lurie-sfumato-sunset.jpg'),
+    ('Утро в Пейзажном парке', '90 × 70 см', '150 000 ₽', 'img/assets/lurie-sfumato-park.jpg'),
+    ('Туманное утро. Острова', '150 × 170 см', '580 000 ₽', 'img/assets/lurie-sfumato-islands.jpg'),
+    ('Закат', '100 × 100 см', '160 000 ₽', 'img/assets/lurie-sfumato-sunset.jpg'),
 ]
 lurie_end = max(i for i, product in enumerate(products) if product['resident'] == 'Ирина Лурье') + 1
 products[lurie_end:lurie_end] = [
